@@ -5,6 +5,9 @@ BeeCook is a recipe discovery and recipe management web application built with N
 Link: 
 https://bee-cook-tirmidzi-ahmad-fuzna.vercel.app/
 
+<img width="1883" height="1106" alt="image" src="https://github.com/user-attachments/assets/07ad0ae9-5bc8-44ab-9148-9ddafee49fe4" />
+
+
 The app consumes an external REST API provided for the Gbee Glow Indonesia frontend developer pretest.
 
 ## Tech Stack
