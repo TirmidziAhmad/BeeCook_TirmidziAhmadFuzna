@@ -1,16 +1,30 @@
 import Link from "next/link"
-
 import { RecipeManagementTable } from "@/components/recipe-management-table"
 import { menuService } from "@/lib/api"
 
-export default async function KelolaPage() {
-  let menus: any[] = []
+export default async function KelolaPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>
+}) {
+  const params = await searchParams;
+  const currentPage = Number(params.page) || 1;
+  const limit = 6;
+
+  let menus: any[] = [];
+  let totalPages = 1;
 
   try {
-    const data = await menuService.getMenus({ limit: 50 })
-    menus = data.menus || []
-  } catch {
-    menus = []
+    const data = await menuService.getMenus({ 
+      limit, 
+      page: currentPage 
+    });
+    
+    menus = data.menus || [];
+    totalPages = data.totalPages;
+  } catch (error) {
+    console.error("Fetch error:", error);
+    menus = [];
   }
 
   const recipes = menus.map((menu: any) => ({
@@ -18,7 +32,7 @@ export default async function KelolaPage() {
     name: menu.name,
     category: menu.category?.name || "Uncategorized",
     fileId: menu.file_id || String(menu.id),
-  }))
+  }));
 
   return (
     <div className="bg-white">
@@ -34,8 +48,13 @@ export default async function KelolaPage() {
           Tambah Resep
         </Link>
 
-        <RecipeManagementTable recipes={recipes} />
+        {/* Pass pagination props to the client component */}
+        <RecipeManagementTable 
+          recipes={recipes} 
+          currentPage={currentPage} 
+          totalPages={totalPages} 
+        />
       </section>
     </div>
-  )
+  );
 }

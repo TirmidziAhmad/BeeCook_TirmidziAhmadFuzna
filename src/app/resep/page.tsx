@@ -16,13 +16,14 @@ export default async function ResepPage({
   let categories: any[] = []
   let menus: any[] = []
   let totalPages = 1
+  const limit = 6;
 
   try {
     const [catData, menuData] = await Promise.all([
       categoryService.getCategories(),
       menuService.getMenus({
         page: currentPage,
-        limit: 15,
+        limit: limit,
         category_id: categoryId,
         search,
       }),
@@ -34,6 +35,7 @@ export default async function ResepPage({
     categories = []
     menus = []
   }
+  console.log(menus)
 
   return (
     <div className="bg-white">
@@ -137,33 +139,71 @@ export default async function ResepPage({
           )}
         </div>
 
-        <nav
-          className="mt-12 flex items-center justify-center gap-3 text-sm font-medium text-zinc-950"
-          aria-label="Pagination"
+<nav
+  className="mt-12 flex items-center justify-center gap-2 text-sm font-medium text-zinc-950"
+  aria-label="Pagination"
+>
+  {currentPage > 1 ? (
+    <Link
+      href={`/resep?page=${currentPage - 1}${categoryId ? `&category_id=${categoryId}` : ""}${search ? `&search=${search}` : ""}`}
+      className="px-2 transition-colors hover:text-[#E8B431]"
+    >
+      « Previous
+    </Link>
+  ) : (
+    <span className="px-2 text-zinc-400 cursor-not-allowed">« Previous</span>
+  )}
+
+  {(() => {
+    const pages = [];
+    if (totalPages <= 7) {
+      for (let i = 1; i <= totalPages; i++) pages.push(i);
+    } else {
+      if (currentPage <= 3) {
+        pages.push(1, 2, 3, "...", totalPages);
+      } else if (currentPage >= totalPages - 2) {
+        pages.push(1, "...", totalPages - 2, totalPages - 1, totalPages);
+      } else {
+        pages.push(1, "...", currentPage - 1, currentPage, currentPage + 1, "...", totalPages);
+      }
+    }
+
+    return pages.map((page, idx) =>
+      page === "..." ? (
+        <span key={`ellipsis-${idx}`} className="flex size-8 items-center justify-center text-zinc-400">
+          ···
+        </span>
+      ) : page === currentPage ? (
+        <span
+          key={page}
+          className="flex size-8 items-center justify-center rounded-full bg-zinc-100 text-zinc-950"
+          aria-current="page"
         >
-          {currentPage > 1 && (
-            <Link
-              href={`/resep?page=${currentPage - 1}${categoryId ? `&category_id=${categoryId}` : ""}${search ? `&search=${search}` : ""}`}
-              className="transition-colors hover:text-[#E8B431]"
-            >
-              « Previous
-            </Link>
-          )}
-          <span
-            className="flex size-8 items-center justify-center rounded-full bg-zinc-100 text-zinc-950"
-            aria-current="page"
-          >
-            {currentPage}
-          </span>
-          {currentPage < totalPages && (
-            <Link
-              href={`/resep?page=${currentPage + 1}${categoryId ? `&category_id=${categoryId}` : ""}${search ? `&search=${search}` : ""}`}
-              className="transition-colors hover:text-[#E8B431]"
-            >
-              Next »
-            </Link>
-          )}
-        </nav>
+          {page}
+        </span>
+      ) : (
+        <Link
+          key={page}
+          href={`/resep?page=${page}${categoryId ? `&category_id=${categoryId}` : ""}${search ? `&search=${search}` : ""}`}
+          className="flex size-8 items-center justify-center rounded-full transition-colors hover:bg-zinc-100 hover:text-[#E8B431]"
+        >
+          {page}
+        </Link>
+      )
+    );
+  })()}
+
+  {currentPage < totalPages ? (
+    <Link
+      href={`/resep?page=${currentPage + 1}${categoryId ? `&category_id=${categoryId}` : ""}${search ? `&search=${search}` : ""}`}
+      className="px-2 transition-colors hover:text-[#E8B431]"
+    >
+      Next »
+    </Link>
+  ) : (
+    <span className="px-2 text-zinc-400 cursor-not-allowed">Next »</span>
+  )}
+</nav>
       </section>
     </div>
   )

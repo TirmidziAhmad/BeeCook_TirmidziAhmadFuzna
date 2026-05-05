@@ -1,119 +1,108 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import { useRouter } from "next/navigation"
+import Link from "next/link";
+import { usePathname, useSearchParams } from "next/navigation";
 import {
   type ChangeEvent,
   type DragEvent,
   useEffect,
   useRef,
   useState,
-} from "react"
-import { X } from "lucide-react"
-import { menuService } from "@/lib/api"
+} from "react";
+import { X, ChevronLeft, ChevronRight } from "lucide-react";
+import { menuService } from "@/lib/api";
 
 export type ManagedRecipe = {
-  id: number
-  name: string
-  category: string
-  fileId: string
-}
+  id: number;
+  name: string;
+  category: string;
+  fileId: string;
+};
 
 type RecipeManagementTableProps = {
-  recipes: ManagedRecipe[]
-}
+  recipes: ManagedRecipe[];
+  currentPage: number;
+  totalPages: number;
+};
 
 export function RecipeManagementTable({
-  recipes: initialRecipes,
+  recipes,
+  currentPage,
+  totalPages,
 }: RecipeManagementTableProps) {
-  const router = useRouter()
-  const [recipes, setRecipes] = useState(initialRecipes)
-  const [selectedRecipe, setSelectedRecipe] = useState<ManagedRecipe | null>(null)
-  const [isDeleting, setIsDeleting] = useState(false)
-  
-  // Upload modal state
-  const [uploadRecipe, setUploadRecipe] = useState<ManagedRecipe | null>(null)
-  const [isDragging, setIsDragging] = useState(false)
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
-  const [selectedFile, setSelectedFile] = useState<File | null>(null)
-  const [isUploading, setIsUploading] = useState(false)
-  const fileInputRef = useRef<HTMLInputElement | null>(null)
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  // Modal & Action States
+  const [selectedRecipe, setSelectedRecipe] = useState<ManagedRecipe | null>(
+    null,
+  );
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [uploadRecipe, setUploadRecipe] = useState<ManagedRecipe | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  // Pagination Helper: Generates the URL for a specific page
+  const createPageURL = (pageNumber: number | string) => {
+    const params = new URLSearchParams(searchParams);
+    params.set("page", pageNumber.toString());
+    return `${pathname}?${params.toString()}`;
+  };
 
   useEffect(() => {
     return () => {
-      if (previewUrl) {
-        URL.revokeObjectURL(previewUrl)
-      }
-    }
-  }, [previewUrl])
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
+    };
+  }, [previewUrl]);
 
+  // --- Handlers ---
   async function confirmDelete() {
-    if (!selectedRecipe) {
-      return
-    }
-
-    setIsDeleting(true)
+    if (!selectedRecipe) return;
+    setIsDeleting(true);
     try {
-      await menuService.deleteMenu(selectedRecipe.id)
-      setRecipes((currentRecipes) =>
-        currentRecipes.filter((recipe) => recipe.id !== selectedRecipe.id)
-      )
-      setSelectedRecipe(null)
-      router.refresh()
+      await menuService.deleteMenu(selectedRecipe.id);
+      setSelectedRecipe(null);
+      window.location.reload(); // Refresh to update server-side data
     } catch (error) {
-      alert(error instanceof Error ? error.message : "Gagal menghapus resep")
+      alert(error instanceof Error ? error.message : "Gagal menghapus resep");
     } finally {
-      setIsDeleting(false)
+      setIsDeleting(false);
     }
   }
 
   function openUploadModal(recipe: ManagedRecipe) {
-    setUploadRecipe(recipe)
-    setPreviewUrl(null)
+    setUploadRecipe(recipe);
+    setPreviewUrl(null);
   }
 
   function closeUploadModal() {
-    setUploadRecipe(null)
-    setIsDragging(false)
-    setPreviewUrl(null)
-    if (fileInputRef.current) {
-      fileInputRef.current.value = ""
-    }
+    setUploadRecipe(null);
+    setIsDragging(false);
+    setPreviewUrl(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
   }
 
   function handleFiles(files: FileList | null) {
-    const file = files?.[0]
-
-    if (!file || !file.type.startsWith("image/")) {
-      return
-    }
-
-    setSelectedFile(file)
-    setPreviewUrl(URL.createObjectURL(file))
-  }
-
-  function handleFileInputChange(event: ChangeEvent<HTMLInputElement>) {
-    handleFiles(event.target.files)
-  }
-
-  function handleDrop(event: DragEvent<HTMLLabelElement>) {
-    event.preventDefault()
-    setIsDragging(false)
-    handleFiles(event.dataTransfer.files)
+    const file = files?.[0];
+    if (!file || !file.type.startsWith("image/")) return;
+    setSelectedFile(file);
+    setPreviewUrl(URL.createObjectURL(file));
   }
 
   async function handleUpload() {
-    if (!uploadRecipe || !selectedFile) return
-
-    setIsUploading(true)
+    if (!uploadRecipe || !selectedFile) return;
+    setIsUploading(true);
     try {
-      await menuService.uploadImage(uploadRecipe.id, selectedFile)
-      closeUploadModal()
-      router.refresh()
+      await menuService.uploadImage(uploadRecipe.id, selectedFile);
+      closeUploadModal();
+      window.location.reload();
     } catch (error) {
-      alert(error instanceof Error ? error.message : "Gagal mengupload gambar")
+      alert(error instanceof Error ? error.message : "Gagal mengupload gambar");
     } finally {
-      setIsUploading(false)
+      setIsUploading(false);
     }
   }
 
@@ -141,7 +130,6 @@ export function RecipeManagementTable({
                 <td className="px-4 py-4">
                   <div className="flex items-center justify-center gap-4">
                     <button
-                      type="button"
                       onClick={() => setSelectedRecipe(recipe)}
                       className="text-red-500 transition-colors hover:text-red-600"
                     >
@@ -154,7 +142,6 @@ export function RecipeManagementTable({
                       Edit
                     </Link>
                     <button
-                      type="button"
                       onClick={() => openUploadModal(recipe)}
                       className="text-teal-600 transition-colors hover:text-teal-700"
                     >
@@ -178,55 +165,85 @@ export function RecipeManagementTable({
         </table>
       </div>
 
-      <nav
-        className="mt-5 flex items-center gap-4 px-4 text-sm font-medium text-[#111827]"
-        aria-label="Pagination"
-      >
-        <Link href="/kelola" className="transition-colors hover:text-[#E8B431]">
-          «
+      {/* Pagination Controls */}
+      <nav className="mt-5 flex items-center gap-4 px-4 text-sm font-medium text-[#111827]">
+        <Link
+          href={createPageURL(currentPage - 1)}
+          className={`flex items-center transition-colors hover:text-[#E8B431] ${
+            currentPage <= 1 ? "pointer-events-none opacity-30" : ""
+          }`}
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="lucide lucide-chevrons-left-icon lucide-chevrons-left"
+          >
+            <path d="m11 17-5-5 5-5" />
+            <path d="m18 17-5-5 5-5" />
+          </svg>
         </Link>
-        <span className="flex size-9 items-center justify-center rounded-full border border-zinc-200 bg-white">
-          1
-        </span>
-        <span>of</span>
-        <Link href="/kelola" className="transition-colors hover:text-[#E8B431]">
-          3»
+
+        <div className="flex items-center gap-2">
+          <span className="flex size-9 items-center justify-center rounded-full border border-zinc-200 bg-white">
+            {currentPage}
+          </span>
+          <span className="text-zinc-500">of</span>
+          <span className="text-zinc-500">{totalPages || 1}</span>
+        </div>
+
+        <Link
+          href={createPageURL(currentPage + 1)}
+          className={`flex items-center transition-colors hover:text-[#E8B431] ${
+            currentPage >= totalPages ? "pointer-events-none opacity-30" : ""
+          }`}
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="lucide lucide-chevrons-right-icon lucide-chevrons-right"
+          >
+            <path d="m6 17 5-5-5-5" />
+            <path d="m13 17 5-5-5-5" />
+          </svg>
         </Link>
       </nav>
 
       {/* Delete Modal */}
       {selectedRecipe && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-[#111827]/55 px-4"
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="delete-recipe-title"
-        >
-          <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-[0_24px_60px_rgba(15,23,42,0.28)]">
-            <h2
-              id="delete-recipe-title"
-              className="text-2xl font-semibold tracking-normal text-zinc-950"
-            >
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#111827]/55 px-4">
+          <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-xl">
+            <h2 className="text-2xl font-semibold text-zinc-950">
               Hapus Resep?
             </h2>
-            <p className="mt-3 text-sm leading-6 text-zinc-600">
+            <p className="mt-3 text-sm text-zinc-600">
               Resep <span className="font-semibold">{selectedRecipe.name}</span>{" "}
-              akan dihapus dari daftar kelola.
+              akan dihapus.
             </p>
-
             <div className="mt-6 flex justify-end gap-3">
               <button
-                type="button"
                 onClick={() => setSelectedRecipe(null)}
-                className="h-10 rounded-lg border border-zinc-200 px-5 text-sm font-medium text-[#111827] transition-colors hover:bg-zinc-50"
+                className="h-10 rounded-lg border border-zinc-200 px-5 text-sm font-medium"
               >
                 Batal
               </button>
               <button
-                type="button"
                 onClick={confirmDelete}
                 disabled={isDeleting}
-                className="h-10 rounded-lg bg-red-500 px-5 text-sm font-medium text-white transition-colors hover:bg-red-600 disabled:cursor-not-allowed disabled:opacity-60"
+                className="h-10 rounded-lg bg-red-500 px-5 text-sm font-medium text-white disabled:opacity-60"
               >
                 {isDeleting ? "Menghapus..." : "Hapus"}
               </button>
@@ -237,26 +254,15 @@ export function RecipeManagementTable({
 
       {/* Upload Modal */}
       {uploadRecipe && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/35 px-4"
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="upload-image-title"
-        >
-          <div className="relative w-full max-w-[480px] rounded-xl bg-white p-6 shadow-[0_24px_60px_rgba(15,23,42,0.28)]">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/35 px-4">
+          <div className="relative w-full max-w-[480px] rounded-xl bg-white p-6 shadow-2xl">
             <button
-              type="button"
               onClick={closeUploadModal}
-              className="absolute right-5 top-5 flex size-8 items-center justify-center rounded-md bg-zinc-100 text-zinc-500 transition-colors hover:bg-zinc-200 hover:text-zinc-800"
-              aria-label="Tutup modal upload gambar"
+              className="absolute right-5 top-5 p-2 text-zinc-400 hover:text-zinc-800"
             >
-              <X className="size-4" />
+              <X className="size-5" />
             </button>
-
-            <h2
-              id="upload-image-title"
-              className="text-center text-xl font-semibold tracking-normal text-[#111827]"
-            >
+            <h2 className="text-center text-xl font-semibold text-[#111827]">
               Upload Gambar
             </h2>
 
@@ -265,142 +271,60 @@ export function RecipeManagementTable({
               type="file"
               accept="image/*"
               className="hidden"
-              onChange={handleFileInputChange}
+              onChange={(e) => handleFiles(e.target.files)}
             />
 
             <label
-              onDragOver={(event) => {
-                event.preventDefault()
-                setIsDragging(true)
+              onDragOver={(e) => {
+                e.preventDefault();
+                setIsDragging(true);
               }}
               onDragLeave={() => setIsDragging(false)}
-              onDrop={handleDrop}
-              className={
+              onDrop={(e) => {
+                e.preventDefault();
+                setIsDragging(false);
+                handleFiles(e.dataTransfer.files);
+              }}
+              className={`mt-8 flex flex-col items-center justify-center rounded-xl border-2 border-dashed py-10 transition-colors cursor-pointer ${
                 isDragging
-                  ? "mt-8 flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-[#3b82f6] bg-[#eff6ff] py-10 text-center transition-colors"
-                  : "mt-8 flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-zinc-200 bg-white py-10 text-center transition-colors hover:border-[#3b82f6]/50"
-              }
+                  ? "border-blue-500 bg-blue-50"
+                  : "border-zinc-200 hover:border-blue-400"
+              }`}
+              onClick={() => fileInputRef.current?.click()}
             >
-              <svg
-                viewBox="0 0 44 44"
-                fill="none"
-                className="size-12 text-blue-500"
-                aria-hidden="true"
-              >
-                <rect
-                  x="8"
-                  y="12"
-                  width="22"
-                  height="22"
-                  rx="4"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                />
-                <rect
-                  x="15"
-                  y="7"
-                  width="22"
-                  height="22"
-                  rx="4"
-                  fill="white"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                />
-                <path
-                  d="M19 25l5-5 4 4 2-2 4 4"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-                <circle cx="30" cy="15" r="2" fill="currentColor" />
-              </svg>
-
-              <span className="mt-4 text-sm text-zinc-700">
-                Drop your files here or{" "}
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.preventDefault()
-                    fileInputRef.current?.click()
-                  }}
-                  className="font-medium text-blue-500 hover:text-blue-600"
-                >
-                  browse
-                </button>
-              </span>
-              <span className="mt-1 text-xs text-zinc-400">
-                Maximum size: 50MB
+              <span className="text-sm text-zinc-600">
+                Click or drag image here
               </span>
             </label>
 
-            <div className="mt-6">
-              <span className="text-sm font-medium text-zinc-700">Preview</span>
-              <div
-                className="mt-2 flex h-[240px] w-full items-center justify-center overflow-hidden rounded-xl bg-zinc-50"
-                style={
-                  previewUrl ? { backgroundImage: `url(${previewUrl})`, backgroundSize: 'cover', backgroundPosition: 'center' } : undefined
-                }
-              >
-                {!previewUrl && (
-                  <svg
-                    viewBox="0 0 64 64"
-                    fill="none"
-                    className="size-20 text-zinc-300"
-                    aria-hidden="true"
-                  >
-                    <rect
-                      x="18"
-                      y="16"
-                      width="30"
-                      height="38"
-                      rx="2"
-                      transform="rotate(15 18 16)"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                    />
-                    <rect
-                      x="14"
-                      y="23"
-                      width="30"
-                      height="30"
-                      rx="2"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                    />
-                    <path
-                      d="M19 45l8-9 5 5 4-4 5 8"
-                      stroke="currentColor"
-                      strokeWidth="3"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                    <circle cx="36" cy="31" r="3" fill="currentColor" />
-                  </svg>
-                )}
+            {previewUrl && (
+              <div className="mt-6 h-[200px] w-full rounded-xl border overflow-hidden bg-zinc-50">
+                <img
+                  src={previewUrl}
+                  alt="Preview"
+                  className="h-full w-full object-cover"
+                />
               </div>
-            </div>
+            )}
 
             <div className="mt-8 flex justify-end gap-3">
               <button
-                type="button"
                 onClick={closeUploadModal}
-                className="h-10 rounded-lg border border-zinc-200 px-5 text-sm font-medium text-[#111827] transition-colors hover:bg-zinc-50"
+                className="h-10 px-5 text-sm border rounded-lg"
               >
                 Cancel
               </button>
               <button
-                type="button"
                 onClick={handleUpload}
-                className="h-10 rounded-lg bg-blue-500 px-6 text-sm font-medium text-white transition-colors hover:bg-blue-600 disabled:cursor-not-allowed disabled:opacity-60"
                 disabled={!previewUrl || isUploading}
+                className="h-10 bg-blue-500 text-white px-6 rounded-lg disabled:opacity-50"
               >
-                {isUploading ? "Mengupload..." : "Upload"}
+                {isUploading ? "Uploading..." : "Upload"}
               </button>
             </div>
           </div>
         </div>
       )}
     </>
-  )
+  );
 }
