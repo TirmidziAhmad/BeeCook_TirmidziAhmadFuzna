@@ -100,7 +100,7 @@ export function SiteFooter() {
         </div>
 
         <div className="flex items-start gap-2 md:justify-end">
-          {socialLinks.map(({ href, label, icon: Icon, imageSrc }) => (
+          {socialLinks.map(({ href, label, icon: Icon }) => (
             <Link
               key={label}
               href={href}
@@ -109,11 +109,7 @@ export function SiteFooter() {
               target="_blank"
               rel="noreferrer"
             >
-              {imageSrc ? (
-                <Image src={imageSrc} alt="" width={20} height={20} />
-              ) : (
-                Icon && <Icon className="size-4" />
-              )}
+              {Icon && <Icon className="size-4" />}
             </Link>
           ))}
         </div>
