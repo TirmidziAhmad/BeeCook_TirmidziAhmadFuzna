@@ -90,11 +90,7 @@ The app does not define internal Next.js API routes or a local database layer. I
 
 ## API
 
-The API base URL is defined in `src/lib/api/config.ts`:
-
-```ts
-export const API_BASE_URL = "https://frontend-api.gbeeglow.id";
-```
+The API base URL is read from the `API_BASE_URL` environment variable, configured in `src/lib/api/config.ts`.
 
 Main endpoints used by the app:
 
@@ -115,10 +111,18 @@ See `api.md` for the full exported API collection.
 
 ## Getting Started
 
-Install dependencies:
+Clone the repository and install dependencies:
 
 ```bash
+git clone https://github.com/TirmidziAhmad/BeeCook_TirmidziAhmadFuzna.git
+cd BeeCook_TirmidziAhmadFuzna
 npm install
+```
+
+Create a `.env` file in the project root:
+
+```env
+API_BASE_URL=https://frontend-api.gbeeglow.id
 ```
 
 Run the development server:
@@ -187,6 +191,6 @@ Allowed remote image hosts are configured in `next.config.ts`:
 
 ## Development Notes
 
-- This project currently uses a hardcoded API base URL instead of environment variables.
+- The `API_BASE_URL` environment variable must be set for the app to function. See [Getting Started](#getting-started).
 - Mutating operations are called from the browser, so any production use should review API security, authentication, and CORS behavior.
 - Some API response fields are still typed loosely in the codebase and can be tightened as the API contract stabilizes.

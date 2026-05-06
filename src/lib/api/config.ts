@@ -1,4 +1,4 @@
-export const API_BASE_URL = 'https://frontend-api.gbeeglow.id';
+export const API_BASE_URL = process.env.API_BASE_URL;
 
 /**
  * Construct a Google Drive direct image URL from a file_id.
