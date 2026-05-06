@@ -255,14 +255,15 @@ export function RecipeManagementTable({
       {/* Upload Modal */}
       {uploadRecipe && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/35 px-4">
-          <div className="relative w-full max-w-[480px] rounded-xl bg-white p-6 shadow-2xl">
+          <div className="relative w-full max-w-[420px] rounded-2xl bg-white px-6 pb-6 pt-7 shadow-2xl">
             <button
               onClick={closeUploadModal}
-              className="absolute right-5 top-5 p-2 text-zinc-400 hover:text-zinc-800"
+              className="absolute right-4 top-4 p-1.5 text-zinc-400 transition-colors hover:text-zinc-800"
             >
-              <X className="size-5" />
+              <X className="size-4" />
             </button>
-            <h2 className="text-center text-xl font-semibold text-[#111827]">
+
+            <h2 className="text-lg font-semibold text-[#111827]">
               Upload Gambar
             </h2>
 
@@ -274,7 +275,8 @@ export function RecipeManagementTable({
               onChange={(e) => handleFiles(e.target.files)}
             />
 
-            <label
+            {/* Drop Zone */}
+            <div
               onDragOver={(e) => {
                 e.preventDefault();
                 setIsDragging(true);
@@ -285,39 +287,75 @@ export function RecipeManagementTable({
                 setIsDragging(false);
                 handleFiles(e.dataTransfer.files);
               }}
-              className={`mt-8 flex flex-col items-center justify-center rounded-xl border-2 border-dashed py-10 transition-colors cursor-pointer ${
+              onClick={() => fileInputRef.current?.click()}
+              className={`mt-5 flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed px-4 py-8 transition-colors ${
                 isDragging
                   ? "border-blue-500 bg-blue-50"
-                  : "border-zinc-200 hover:border-blue-400"
+                  : "border-zinc-200 bg-zinc-50/50 hover:border-blue-400"
               }`}
-              onClick={() => fileInputRef.current?.click()}
             >
-              <span className="text-sm text-zinc-600">
-                Click or drag image here
-              </span>
-            </label>
+              {/* Blue image icon */}
+              <svg
+                className="mb-3 size-10 text-blue-500"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                <circle cx="9" cy="9" r="2" />
+                <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" />
+              </svg>
 
-            {previewUrl && (
-              <div className="mt-6 h-[200px] w-full rounded-xl border overflow-hidden bg-zinc-50">
-                <img
-                  src={previewUrl}
-                  alt="Preview"
-                  className="h-full w-full object-cover"
-                />
+              <p className="text-sm text-zinc-500">
+                Drop your files here or{" "}
+                <span className="font-medium text-blue-600">browse</span>
+              </p>
+              <p className="mt-1 text-xs text-zinc-400">Maximum size: 50MB</p>
+            </div>
+
+            {/* Preview Section — always visible */}
+            <div className="mt-5">
+              <p className="mb-2 text-sm font-medium text-zinc-500">Preview</p>
+              <div className="flex h-[180px] w-full items-center justify-center overflow-hidden rounded-xl border border-zinc-100 bg-zinc-50">
+                {previewUrl ? (
+                  <img
+                    src={previewUrl}
+                    alt="Preview"
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  <svg
+                    className="size-14 text-zinc-300"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                    <circle cx="9" cy="9" r="2" />
+                    <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" />
+                  </svg>
+                )}
               </div>
-            )}
+            </div>
 
-            <div className="mt-8 flex justify-end gap-3">
+            {/* Actions */}
+            <div className="mt-6 flex justify-end gap-3">
               <button
                 onClick={closeUploadModal}
-                className="h-10 px-5 text-sm border rounded-lg"
+                className="h-9 rounded-lg border border-zinc-200 px-5 text-sm font-medium text-zinc-600 transition-colors hover:bg-zinc-50"
               >
                 Cancel
               </button>
               <button
                 onClick={handleUpload}
                 disabled={!previewUrl || isUploading}
-                className="h-10 bg-blue-500 text-white px-6 rounded-lg disabled:opacity-50"
+                className="h-9 rounded-lg bg-blue-600 px-5 text-sm font-medium text-white transition-colors hover:bg-blue-700 disabled:opacity-50"
               >
                 {isUploading ? "Uploading..." : "Upload"}
               </button>
