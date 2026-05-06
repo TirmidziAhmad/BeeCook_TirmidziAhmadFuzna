@@ -35,8 +35,8 @@ export default async function Home() {
       <section className="relative z-10">
         <div className="relative z-10 mx-auto grid min-h-[calc(100vh-4rem)] w-full max-w-6xl items-center gap-10 px-4 py-12 sm:px-6 lg:grid-cols-[0.92fr_1.08fr] lg:px-8">
           <div className="flex flex-col items-start">
-            <h1 className="w-full font-semibold text-zinc-950 flex flex-col gap-2">
-              <span className="text-[54px] sm:text-[84px] leading-none tracking-[0.005em] font-semibold whitespace-nowrap">
+            <h1 className="w-full font-semibold text-zinc-950 flex flex-col gap-1 sm:gap-2">
+              <span className="text-[48px] sm:text-[64px] md:text-[74px] lg:text-[84px] leading-none tracking-[0.005em] font-semibold whitespace-nowrap">
                 Where{" "}
                 <span className="relative inline-block text-[#E8B431] font-extrabold">
                   Quality
@@ -45,11 +45,11 @@ export default async function Home() {
                     alt=""
                     width={74}
                     height={75}
-                    className="pointer-events-none absolute -right-12 -top-10 sm:-right-14 sm:-top-10 sm:size-14"
+                    className="pointer-events-none absolute -right-8 -top-7 size-8 sm:-right-12 sm:-top-10 sm:size-11 md:size-14 md:-right-14"
                   />
                 </span>
               </span>
-              <span className="text-[44px] sm:text-[64px] leading-none tracking-[0.005em] font-semibold">
+              <span className="text-[38px] sm:text-[50px] md:text-[58px] lg:text-[64px] leading-none tracking-[0.005em] font-semibold">
                 Meets <span className="font-extrabold">Flavor.</span>
               </span>
             </h1>
@@ -58,7 +58,7 @@ export default async function Home() {
               href="/resep"
               className={cn(
                 buttonVariants({ size: "lg" }),
-                "mt-8 w-[237px] h-16 bg-[#111827] px-5 text-white hover:bg-[#111827]/90 font-[family-name:var(--font-inter)]"
+                "mt-6 sm:mt-8 w-[200px] sm:w-[237px] h-12 sm:h-16 bg-[#111827] px-5 text-sm sm:text-base text-white hover:bg-[#111827]/90 font-[family-name:var(--font-inter)]"
               )}
             >
               Eksplor Sekarang
@@ -81,13 +81,13 @@ export default async function Home() {
             </div>
           </div>
 
-          <div className="relative aspect-square w-full max-w-lg sm:aspect-[4/3] lg:aspect-[1/1] lg:max-w-none">
+          <div className="relative aspect-square w-full max-w-xs sm:max-w-lg sm:aspect-[4/3] lg:aspect-[1/1] lg:max-w-none mx-auto">
             <Image
               src="/hero.png"
               alt="Hidangan Beecook"
               fill
               priority
-              className="object-contain scale-[2] translate-x-[30%] lg:scale-[2] lg:translate-x-[50%]"
+              className="object-contain scale-[1.4] translate-x-[15%] sm:scale-[1.8] sm:translate-x-[25%] lg:scale-[2] lg:translate-x-[50%]"
             />
           </div>
         </div>
@@ -149,18 +149,18 @@ export default async function Home() {
             </p>
 
             <form className="mt-6 flex w-full flex-col gap-3 sm:flex-row">
-              <label className="relative flex h-12 flex-1 items-center h-[59px]">
+              <label className="relative flex h-[52px] sm:h-[59px] flex-1 items-center">
                 <Mail className="pointer-events-none absolute left-4 size-4 text-zinc-500" />
                 <span className="sr-only">Email</span>
                 <input
                   type="email"
                   placeholder="you@email.com"
-                  className="h-full w-full rounded-lg border border-zinc-200 bg-white pl-11 pr-4 text-sm text-zinc-950 outline-none transition-colors placeholder:text-zinc-500 focus:border-[#E8B431] focus:ring-3 focus:ring-[#E8B431]/20"
+                  className="h-full w-full rounded-lg border border-zinc-200 bg-white pl-11 pr-4 text-sm sm:text-base text-zinc-950 outline-none transition-colors placeholder:text-zinc-500 focus:border-[#E8B431] focus:ring-3 focus:ring-[#E8B431]/20"
                 />
               </label>
               <button
                 type="submit"
-                className="h-12 rounded-lg bg-[#111827] px-8 text-sm font-medium h-[59px] text-white transition-colors hover:bg-[#111827]/90"
+                className="h-[52px] sm:h-[59px] rounded-lg bg-[#111827] px-8 text-sm sm:text-base font-medium text-white transition-colors hover:bg-[#111827]/90"
               >
                 Langganan
               </button>
