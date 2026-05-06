@@ -180,10 +180,10 @@ export function RecipeManagementTable({
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            class="lucide lucide-chevrons-left-icon lucide-chevrons-left"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="lucide lucide-chevrons-left-icon lucide-chevrons-left"
           >
             <path d="m11 17-5-5 5-5" />
             <path d="m18 17-5-5 5-5" />
@@ -211,10 +211,10 @@ export function RecipeManagementTable({
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            class="lucide lucide-chevrons-right-icon lucide-chevrons-right"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="lucide lucide-chevrons-right-icon lucide-chevrons-right"
           >
             <path d="m6 17 5-5-5-5" />
             <path d="m13 17 5-5-5-5" />
